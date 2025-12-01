@@ -9,6 +9,9 @@ mkdir -p "$OUTPUT_DIR"
 echo "Starting parallel Pokémon data fetching..."
 echo "-------------------------------------------"
 
+# Array to store PIDs of background jobs
+pids=()
+
 # Loop through Pokémon and fetch each in parallel
 for p in "${pokemons[@]}"; do
     (
@@ -20,16 +23,25 @@ for p in "${pokemons[@]}"; do
             echo "✔ Saved $file_name"
         else
             echo "✘ Failed to fetch $p" >&2
+            # Kill this process explicitly (for demonstration)
+            kill $$ 2>/dev/null
         fi
     ) &
+    # Store the PID of the background job
+    pids+=($!)
 done
 
-# wait → Wait for ALL background jobs to finish
-wait
+# Optional: example of killing a stuck process
+# Uncomment to test killing the first process
+# kill "${pids[0]}" 2>/dev/null
+
+# Wait for ALL background jobs to finish
+for pid in "${pids[@]}"; do
+    wait "$pid"
+done
 
 echo "-------------------------------------------"
 echo "All Pokémon data fetched successfully!"
-
 
 #output:
 '''
