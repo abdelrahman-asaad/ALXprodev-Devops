@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # مصفوفة البوكيمونات
-pokemons=("Bulbasaur" "Ivysaur" "Venusaur" "Charmander" "Charmeleon")
+pokemons=("bulbasaur", "ivysaur", "venusaur", "charmander", "charmeleon")
 
 # مجلد حفظ البيانات
 OUTPUT_DIR="pokemon_data"
@@ -26,3 +26,16 @@ for p in "${pokemons[@]}"; do
     # تأخير بسيط لتجنب rate limiting
     sleep 1
 done
+
+#outputexample:
+
+'''Fetching data for Bulbasaur...
+Saved data to pokemon_data/bulbasaur.json ✅
+Fetching data for Ivysaur...
+Saved data to pokemon_data/ivysaur.json ✅
+Fetching data for Venusaur...
+Saved data to pokemon_data/venusaur.json ✅
+Fetching data for Charmander...
+Saved data to pokemon_data/charmander.json ✅
+Fetching data for Charmeleon...
+Saved data to pokemon_data/charmeleon.json ✅'''
