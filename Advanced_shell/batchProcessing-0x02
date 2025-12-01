@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# مصفوفة البوكيمونات
+pokemons=("Bulbasaur" "Ivysaur" "Venusaur" "Charmander" "Charmeleon")
+
+# مجلد حفظ البيانات
+OUTPUT_DIR="pokemon_data"
+
+# إنشاء المجلد لو مش موجود
+mkdir -p "$OUTPUT_DIR"
+
+# حلقة على كل بوكيمون
+for p in "${pokemons[@]}"; do
+    # اسم الملف بخط صغير
+    file_name="$OUTPUT_DIR/$(echo $p | tr '[:upper:]' '[:lower:]').json"
+
+    echo "Fetching data for $p..."
+
+    # طلب API
+    if curl -s -f "https://pokeapi.co/api/v2/pokemon/$(echo $p | tr '[:upper:]' '[:lower:]')" -o "$file_name"; then
+        echo "Saved data to $file_name ✅"
+    else
+        echo "Failed to fetch data for $p" >&2
+    fi
+
+    # تأخير بسيط لتجنب rate limiting
+    sleep 1
+done
