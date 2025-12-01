@@ -1,0 +1,131 @@
+#!/bin/bash
+
+# List of pokemons
+pokemons=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
+
+OUTPUT_DIR="pokemon_data"
+mkdir -p "$OUTPUT_DIR"
+
+echo "Starting parallel Pokémon data fetching..."
+echo "-------------------------------------------"
+
+# Loop through Pokémon and fetch each in parallel
+for p in "${pokemons[@]}"; do
+    (
+        echo "[PID $$] Fetching $p..."
+
+        file_name="$OUTPUT_DIR/$p.json"
+
+        if curl -s -f "https://pokeapi.co/api/v2/pokemon/$p" -o "$file_name"; then
+            echo "✔ Saved $file_name"
+        else
+            echo "✘ Failed to fetch $p" >&2
+        fi
+    ) &
+done
+
+# wait → Wait for ALL background jobs to finish
+wait
+
+echo "-------------------------------------------"
+echo "All Pokémon data fetched successfully!"
+
+
+#output:
+'''
+Starting parallel Pokémon data fetching...
+-------------------------------------------
+[PID 1234] Fetching bulbasaur...
+[PID 1235] Fetching ivysaur...
+[PID 1236] Fetching venusaur...
+[PID 1237] Fetching charmander...
+[PID 1238] Fetching charmeleon...
+✔ Saved pokemon_data/bulbasaur.json
+✔ Saved pokemon_data/ivysaur.json
+✔ Saved pokemon_data/venusaur.json
+✔ Saved pokemon_data/charmander.json
+✔ Saved pokemon_data/charmeleon.json
+-------------------------------------------
+All Pokémon data fetched successfully!
+'''
+
+
+'''💡 إزاي نعمل تنفيذ متوازي في الـ shell؟
+1️⃣ أي أمر نحط في آخره &
+curl ... &
+
+
+ده معناه:
+
+شغّل curl لكن اشتغل في الخلفية (background).
+وما توقفش السكربت… كمّل.
+
+يعني:
+
+curl يبدأ
+
+والـ loop تكمل وتبدأ curl تاني
+
+وهكذا
+
+مثال مبسّط:
+
+sleep 5 &
+sleep 5 &
+sleep 5 &
+
+
+كلهم هيشتغلوا مع بعض
+وهينتهوا في 5 ثواني بس
+مش 15.
+
+2️⃣ وبعد ما نشغّل كل العمليات… نقول للسكربت:
+wait
+
+
+يعني:
+
+استنى كل العمليات اللي شغّلتها في الخلفية تخلص.
+
+من غير wait السكربت هيقفل قبل ما العمليات تخلص.
+
+🎨 مثال بسيط جدًا يوضّح الصورة:
+بدون parallel:
+Start Bulbasaur... Takes 2s
+Start Ivysaur... Takes 2s
+Start Charmander... Takes 2s
+
+Total time = 2 + 2 + 2 = 6 ثواني
+
+مع parallel:
+Start Bulbasaur in background
+Start Ivysaur in background
+Start Charmander in background
+
+All run together → Takes 2 seconds total
+
+🤔 طب إيه فايدة الأقواس ( ) في الكود؟
+
+كنا بنعمل:
+
+(
+   curl ...
+) &
+
+
+ده يعمل subshell
+
+يعني العملية بالكامل تبقى في الخلفية:
+
+curl
+
+echo
+
+كل اللي جوه ()
+
+لو شغلت curl لحاله:
+
+curl ... &
+
+
+برضه هيمشي، بس الأقواس بتنظم العملية كـ job واحد.'''
