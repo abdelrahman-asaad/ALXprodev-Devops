@@ -39,3 +39,50 @@ Fetching data for Charmander...
 Saved data to pokemon_data/charmander.json ✅
 Fetching data for Charmeleon...
 Saved data to pokemon_data/charmeleon.json ✅'''
+
+#___________________
+#!/bin/bash
+
+OUTPUT_DIR="pokemon_data"
+mkdir -p "$OUTPUT_DIR"
+ERROR_LOG="errors.log"
+
+# قائمة البوكيمونات (يمكن تعديلها أو جلبها ديناميكياً)
+pokemons=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
+
+for p in "${pokemons[@]}"; do
+    file_name="$OUTPUT_DIR/$p.json"
+    attempt=1
+    max_attempts=3
+    success=false
+
+    echo "Fetching data for $p..."
+
+    while [ $attempt -le $max_attempts ]; do
+        if curl -s -f "https://pokeapi.co/api/v2/pokemon/$p" -o "$file_name"; then
+            echo "Saved data to $file_name ✅"
+            success=true
+            break
+        else
+            echo "Attempt $attempt failed for $p. Retrying..."
+            attempt=$((attempt+1))
+            sleep 1
+        fi
+    done
+
+    if [ "$success" = false ]; then
+        echo "Failed to fetch data for $p after $max_attempts attempts" | tee -a "$ERROR_LOG"
+    fi
+
+    sleep 1  # delay لتجنب rate-limiting
+done
+
+#outputexample:
+'''Fetching data for bulbasaur...
+Saved data to pokemon_data/bulbasaur.json ✅
+Fetching data for ivysaur...
+Attempt 1 failed for ivysaur. Retrying...
+Saved data to pokemon_data/ivysaur.json ✅
+...
+
+'''
