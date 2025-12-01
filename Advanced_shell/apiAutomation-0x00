@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# URL للبوكيمون Pikachu
+URL="https://pokeapi.co/api/v2/pokemon/pikachu"
+
+# اسم الملفات
+OUTPUT_FILE="data.json"
+ERROR_FILE="errors.txt"
+
+# عمل طلب API باستخدام curl
+if curl -s -f "$URL" -o "$OUTPUT_FILE"; then
+    echo "API request successful. Data saved to $OUTPUT_FILE"
+else
+    echo "API request failed on $(date)" >> "$ERROR_FILE"
+    echo "Check $ERROR_FILE for details"
+fi
